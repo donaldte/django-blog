@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User Profile: {{ object.user.username }}{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Profile Image and Details -->
+    <div class="col-md-4 text-center">
+      <div class="profile-img">
+        <img
+          src="{% if object.profile_image %}{{ object.profile_image.url }}{% else %}https://www.bootdey.com/img/Content/avatar/avatar7.png{% endif %}"
+          class="img-fluid rounded-circle mb-3" alt="{{ object.user.username }}" width="150" height="150">
+      </div>
+      <h3>{{ request.user.name|capfirst }}</h3>
+      <p class="text-muted">{{ request.user.get_location }}</p>
+    </div>
+
+    <!-- Profile Info Form -->
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Profile Information</h4>
+          <form id="profile-update-form">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="bio">Bio</label>
+              <textarea  id="bio" name="bio" class="form-control">{{ request.user.get_bio}}</textarea>
+            </div>
+            <div class="form-group mt-3">
+              <label for="location">Location</label>
+              <input type="text" id="location" name="location" class="form-control" value="{{ request.user.get_location }}">
+            </div>
+            <div class="form-group mt-3">
+              <label for="website">Website</label>
+              <input type="url" id="website" name="website" class="form-control" value="{{ request.user.get_website }}">
+            </div>
+            <button type="button" id="update-profile-btn" class="btn btn-primary mt-3">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    {% if object == request.user %}
+    <!-- Action Buttons -->
+    <div class="mt-4">
+      <h5>Manage Your Profile</h5>
+      <a href="{% url 'users:update' %}" class="btn btn-primary mb-2">Update Profile</a>
+      <a href="{% url 'account_email' %}" class="btn btn-secondary mb-2">Manage Email</a>
+      <a href="{% url 'mfa_index' %}" class="btn btn-secondary mb-2">Multi-Factor Authentication (MFA)</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}
+
+
+{% block javascript %}
+<script>
+  document.getElementById("update-profile-btn").addEventListener("click", function () {
+    // Get form data
+    const bio = document.getElementById("bio").value;
+    const location = document.getElementById("location").value;
+    const website = document.getElementById("website").value;
+    const csrfToken = '{{ csrf_token }}';
+
+    // Confirm with SweetAlert
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to save the changes to your profile?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, save it!",
+      cancelButtonText: "No, cancel!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send AJAX POST request to update profile
+        fetch("{% url 'blog:update_profile_ajax' %}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ bio: bio, location: location, website: website }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire("Success!", data.message, "success");
+            } else {
+              Swal.fire("Error!", data.message, "error");
+            }
+          })
+          .catch(error => {
+            Swal.fire("Error!", "An unexpected error occurred.", "error");
+          });
+      }
+    });
+  });
+</script>
+{% endblock javascript %}

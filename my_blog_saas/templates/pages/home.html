@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block css %}
+<link href="{% static 'css/blog_home.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<section class="blog-listing gray-bg">
+    <div class="container">
+        <form class="mb-4"  method="get">
+            <div class="input-group">
+                <input type="text" class="form-control rounded-0" name="q" placeholder="Search Blogs">
+                <button type="submit" class="btn btn-primary rounded-0">Search</button>
+            </div>
+        </form>
+        <div class="row align-items-start">
+            <!-- Main Content -->
+            <div class="col-lg-9 m-15px-tb">
+                <div class="row">
+                    {% for blog in posts %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="blog-grid">
+                            <div class="blog-img">
+                                <div class="date">
+                                    <span>{{ blog.created|date:"d" }}</span>
+                                    <label>{{ blog.created|date:"M" }}</label>
+                                </div>
+                                <a href="{% url 'blog:blog_detail' blog.id %}">
+                                    <img style="object-fit: cover; width: 100%; height: 300px;"
+                                        src="{% if blog.image %}{{ blog.image.url }}{% else %}https://www.bootdey.com/image/400x200/FFB6C1/000000{% endif %}"
+                                        title="{{ blog.title }}" alt="{{ blog.title }}">
+                                </a>
+                            </div>
+                            <div class="blog-info">
+                                <h5><a href="{% url 'blog:blog_detail' blog.id %}">{{ blog.title }}</a></h5>
+                                <p></p>
+                                <div class="btn-bar">
+                                    <a href="{% url 'blog:blog_detail' blog.id %}" class="px-btn-arrow">
+                                        <span>Read More</span>
+                                        <i class="arrow"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>No blogs found.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="d-flex justify-content-center mt-4">
+                    <ul class="pagination">
+                        {% if posts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+
+                        {% for num in posts.paginator.page_range %}
+                            {% if posts.number == num %}
+                                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-3 m-15px-tb blog-aside">
+                <!-- Trending Post -->
+                <div class="widget widget-post">
+                    <div class="widget-title">
+                        <h3>Trending Now</h3>
+                    </div>
+                    <div class="widget-body">
+                        <!-- Add trending posts here -->
+                    </div>
+                </div>
+                <!-- End Trending Post -->
+
+                <!-- Latest Post -->
+                <div class="widget widget-latest-post">
+                    <div class="widget-title">
+                        <h3>Latest Post</h3>
+                    </div>
+                    <div class="widget-body">
+                        {% for latest in latest_blogs %}
+                        <div class="latest-post-aside media mb-3">
+                            <div class="lpa-left media-body">
+                                <div class="lpa-title">
+                                    <h5><a href="{% url 'blog:blog_detail' latest.id %}">{{ latest.title }}</a></h5>
+                                </div>
+                                <div class="lpa-meta">
+                                    <a class="name" href="#">{{ latest.author }}</a>
+                                    <a class="date" href="#">{{ latest.created|date:"d M Y" }}</a>
+                                </div>
+                            </div>
+                            <div class="lpa-right">
+                                <a href="{% url 'blog:blog_detail' latest.id %}">
+                                    <img src="{% if latest.image %}{{ latest.image.url }}{% else %}https://www.bootdey.com/image/400x200/FFA07A/000000{% endif %}"
+                                        title="{{ latest.title }}" alt="{{ latest.title }}">
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- End Latest Post -->
+
+                <!-- Tags Widget -->
+                <div class="widget widget-tags">
+                    <div class="widget-title">
+                        <h3>Latest Tags</h3>
+                    </div>
+                    <div class="widget-body">
+                        <div class="nav tag-cloud">
+                            {% for tag in tags %}
+                            <a href="">{{ tag.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- End Tags Widget -->
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

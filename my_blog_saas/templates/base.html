@@ -1,0 +1,128 @@
+{% load static i18n %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>{% block title %}my_blog_saas{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="my saas" />
+    <meta name="author" content="Donald Programmer" />
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+
+    {% block css %}    {% endblock css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    <!-- Font Awesome for icons -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>    <!-- Custom CSS -->
+    <link href="{% static 'css/project.css' %}" rel="stylesheet" />
+    <style>
+        /* Active link styling */
+        .nav-link.active {
+            color: #ffffff !important;
+            background-color: #0056b3 !important;
+        }
+        /* Dropdown styling */
+        .dropdown-menu .dropdown-item:hover {
+            background-color: #0056b3 !important;
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="{% block bodyclass %}{% endblock bodyclass %}">
+    {% block body %}
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'blog:home' %}">
+                <i class="fas fa-blog"></i> my_blog_saas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'blog:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/about/' %}active{% endif %}" href="{% url 'blog:about' %}">About</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarAccount" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> Account
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAccount">
+                                <li><a class="dropdown-item" href="{% url 'users:detail' request.user.pk %}"><i class="fas fa-user"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'account_logout' %}"><i class="fas fa-sign-out-alt"></i> Sign Out</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        {% if ACCOUNT_ALLOW_REGISTRATION %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/accounts/signup/' %}active{% endif %}" href="{% url 'account_signup' %}"><i class="fas fa-user-plus"></i> Sign Up</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/accounts/login/' %}active{% endif %}" href="{% url 'account_login' %}"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-dismissible fade show {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        {% block main %}
+            {% block content %}
+                <p>Use this document as a way to quick start any new project.</p>
+            {% endblock content %}
+        {% endblock main %}
+    </main>
+    {% endblock body %}
+
+    {% block modal %}{% endblock modal %}
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; {{ now|date:"Y" }} my_blog_saas. All rights reserved.</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="#" class="text-light">Privacy Policy</a></li>
+                <li class="list-inline-item"><a href="#" class="text-light">Terms of Service</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    {% block javascript %}    {% endblock javascript %}
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YeXLhSN2EdGqIxmKx4NR3G0AQolxkEE69DO4QlgI+p92fI4iZoiI2f6p3leQVqk3cUq4kS2z0g0j5LGsmCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.bundle.min.js" integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/project.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/blog_detail.css' %}">
+{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div id="main-content" class="blog-page">
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-lg-8 col-md-12 left-box">
+                <!-- Blog Post Details -->
+                <div class="card single_post">
+                    <div class="body">
+                        <div class="img-post">
+                            <!-- Display post image or fallback to a default image -->
+                            <img class="d-block img-fluid" src="{% if post.image %}{{ post.image.url }}{% else %}https://www.bootdey.com/image/800x280/87CEFA/000000{% endif %}" alt="{{ post.title }}">
+                        </div>
+                        <h3>{{ post.title }}</h3>
+                        <p>{{ post.content|safe }}</p>
+                    </div>
+                    <div class="footer">
+                        <div class="author-info">
+                            <img src="{% if post.author.profile_image %}{{ post.author.profile_image.url }}{% else %}https://bootdey.com/img/Content/avatar/avatar1.png{% endif %}" alt="{{ post.author.username }}" class="rounded-circle" width="50">
+                            <span>Written by <strong>{{ post.author.username }}</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Comments {{ post.comments.count }}</h2>
+                    </div>
+                    <div class="body">
+                        <ul class="comment-reply list-unstyled">
+                            {% for comment in post.comments.all %}
+                            <li class="row clearfix">
+                                <div class="icon-box col-md-2 col-4">
+                                    <img class="img-fluid img-thumbnail" src="{% if comment.author.profile_image %}{{ comment.author.profile_image.url }}{% else %}https://bootdey.com/img/Content/avatar/avatar7.png{% endif %}" alt="Avatar">
+                                </div>
+                                <div class="text-box col-md-10 col-8 p-l-0 p-r0">
+                                    <h5 class="m-b-0">{{ comment.author.username }}</h5>
+                                    <p>{{ comment.content }}</p>
+                                    <ul class="list-inline">
+                                        <li><a href="javascript:void(0);">{{ comment.created_at|date:"M d Y" }}</a></li>
+                                        <li><a href="javascript:void(0);">Reply</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <p>No comments yet. Be the first to comment!</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Leave a Reply Form -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Leave a reply <small>Your email address will not be published. Required fields are marked*</small></h2>
+                    </div>
+                    <div class="body">
+                        <div class="comment-form">
+                            <form method="post" action="" class="row clearfix">
+                                {% csrf_token %}
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <input type="text" name="name" class="form-control" placeholder="Your Name" required>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <textarea name="content" rows="4" class="form-control no-resize" placeholder="Please type what you want..." required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-block btn-primary">SUBMIT</button>
+                                </div>                                
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 col-md-12 right-box">
+                <!-- Search -->
+                <div class="card">
+                    <div class="body search">
+                        <div class="input-group m-b-0">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa fa-search"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Search...">                                    
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Cloud -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Categories </h2>
+                    </div>
+                    <div class="body widget">
+                        <ul class="list-unstyled categories-clouds m-b-0">
+                            {% for category in categories %}
+                                <li><a href="#">{{ category.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Popular Posts -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Popular Posts</h2>
+                    </div>
+                    <div class="body widget popular-post">
+                        {% for popular_post in popular_posts %}
+                        <div class="single_post">
+                            <p class="m-b-0">{{ popular_post.title }}</p>
+                            <span>{{ popular_post.created_at|date:"M d, Y" }}</span>
+                            <div class="img-post">
+                                <img src="{% if popular_post.image %}{{ popular_post.image.url }}{% else %}https://www.bootdey.com/image/280x280/87CEFA/000000{% endif %}" alt="{{ popular_post.title }}">
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Instagram Widget -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Instagram Post</h2>
+                    </div>
+                    <div class="body widget">
+                        <ul class="list-unstyled instagram-plugin m-b-0">
+                            {% for instagram_post in instagram_posts %}
+                            <li><a href="javascript:void(0);"><img src="" alt="Instagram Image"></a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="card">
+                    <div class="header">
+                        <h2>Email Newsletter <small>Get our products/news earlier than others, let’s get in touch.</small></h2>
+                    </div>
+                    <div class="body widget newsletter">                        
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Enter Email">
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="icon-paper-plane"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Sidebar -->
+        </div>
+    </div>
+</div>
+{% endblock %}
